@@ -49,3 +49,9 @@ Providing info about players.
 Provides info about live games.
 Handling several active games at once.
 Using [Japanese–Multilingual Dictionary](https://gitlab.com/yamagoya/jmdictdb) to verify words.
+
+1. UTF-8 Kana decoding
+2. Comparing words 
+3. Searching words through local jmdict server
+4. Stroing and providing game info (also about already ended games)
+5. Storing and providing profile info
