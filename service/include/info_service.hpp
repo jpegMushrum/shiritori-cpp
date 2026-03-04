@@ -14,8 +14,8 @@ public:
     UserInfo getUserInfo(ull playerid);
     std::vector<GameInfo> getActiveGamesList();
 
-    InfoService(UsersRepo&);
+    InfoService(std::shared_ptr<UsersRepo>);
 private:
-    UsersRepo& usersRepo_;
+    std::shared_ptr<UsersRepo> usersRepo_;
 
 };

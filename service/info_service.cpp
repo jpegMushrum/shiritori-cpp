@@ -5,10 +5,9 @@
 
 using ull = unsigned long long;
 
-InfoService::InfoService(UsersRepo& usersRepo):
+InfoService::InfoService(std::shared_ptr<UsersRepo> usersRepo):
     usersRepo_(usersRepo)
-{
-}
+{}
 
 UserInfo InfoService::getUserInfo(ull id) { 
     UserInfo ui;

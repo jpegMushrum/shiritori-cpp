@@ -4,17 +4,24 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <queue>
+#include <thread>
+#include <functional>
 
 #include "info_service.hpp"
 #include "users_repo.hpp"
 #include "user_info.hpp"
+#include "info_controller.hpp"
+#include "task_queue.hpp"
 
 using ull = unsigned long long;
 
 int main() {
+    auto usersRepo = std::make_shared<UsersRepo>();
+    auto infoService = std::make_unique<InfoService>(usersRepo);
 
-    UsersRepo usersRepo;
-    InfoService infoService(usersRepo);
+    auto taskQueue = std::make_shared<TaskQueue>(std::thread::hardware_concurrency());
+    InfoController infoCtr(taskQueue, std::move(infoService));
 
     while (true) {
         std::string in;
@@ -30,15 +37,16 @@ int main() {
             args.push_back(t);
         }
 
-
         if (command == "getUser") {
             try {
                 ull id = std::stoull(args[0]);
-                UserInfo result = infoService.getUserInfo(id);
-                std::cout << result << "\n";
+                
+                infoCtr.getUserInfo(id, [](UserInfo ui) {
+                    std::cout << ui << '\n';
+                });
             }
             catch (...) {
-                std::cerr << "getPlayer err: bad args";    
+                std::cerr << "getUser err: bad args";    
             }
             
             continue;
