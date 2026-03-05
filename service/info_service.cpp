@@ -1,3 +1,4 @@
+#include <functional>
 #include <memory>
 
 #include "info_service.hpp"
@@ -5,13 +6,11 @@
 
 using ull = unsigned long long;
 
-InfoService::InfoService(std::shared_ptr<UsersRepo> usersRepo):
-    usersRepo_(usersRepo)
-{}
+InfoService::InfoService(std::shared_ptr<UsersRepo> usersRepo) : usersRepo_(usersRepo) {}
 
-UserInfo InfoService::getUserInfo(ull id) { 
-    UserInfo ui;
-    ui.id = id;
+UserInfo InfoService::getUserInfo(ull id)
+{
+    auto user = usersRepo_->getUser(id);
 
-    return ui;
+    return UserInfo(user.id);
 }

@@ -1,18 +1,20 @@
 #pragma once
 
-#include <queue>
+#include <condition_variable>
 #include <functional>
 #include <memory>
-#include <thread>
-#include <condition_variable>
 #include <mutex>
+#include <queue>
+#include <thread>
 
-class TaskQueue{
-public:
+class TaskQueue
+{
+  public:
     TaskQueue(unsigned int);
     ~TaskQueue();
     void addTask(std::function<void()>);
-private:
+
+  private:
     void startWorkerLoop();
 
     std::condition_variable cv_;

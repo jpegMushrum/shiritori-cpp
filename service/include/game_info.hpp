@@ -1,5 +1,5 @@
 #pragma once
 
-class GameInfo {
-
+class GameInfo
+{
 };

@@ -4,10 +4,6 @@
 
 using ull = unsigned long long;
 
-void GameSession::addUser(ull id) {
+void GameSession::addUser(ull id) {}
 
-}
-
-void GameSession::handleWord(ull id, std::string word) {
-
-}
+void GameSession::handleWord(ull id, std::string word) {}
