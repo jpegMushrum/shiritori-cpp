@@ -1,7 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
+#include "game_info.hpp"
 #include "info_service.hpp"
 #include "task_queue.hpp"
 #include "user_info.hpp"
@@ -14,6 +16,7 @@ class InfoController
     InfoController(std::shared_ptr<TaskQueue>, std::unique_ptr<InfoService>);
 
     void getUserInfo(ull id, std::function<void(UserInfo)>);
+    void getActiveGamesInfo(std::function<void(std::vector<GameInfo>)>);
 
   private:
     std::shared_ptr<TaskQueue> taskQueue_;

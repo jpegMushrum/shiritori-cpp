@@ -1,5 +1,6 @@
 add_library(repo STATIC
     users_repo.cpp
+    games_repo.cpp
     dictionary.cpp
     models/user.cpp
     models/game.cpp

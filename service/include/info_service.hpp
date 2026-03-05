@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "game_info.hpp"
+#include "games_repo.hpp"
 #include "user_info.hpp"
 #include "users_repo.hpp"
 
@@ -15,8 +16,9 @@ class InfoService
     UserInfo getUserInfo(ull playerid);
     std::vector<GameInfo> getActiveGamesList();
 
-    InfoService(std::shared_ptr<UsersRepo>);
+    InfoService(std::shared_ptr<UsersRepo>, std::shared_ptr<GamesRepo>);
 
   private:
     std::shared_ptr<UsersRepo> usersRepo_;
+    std::shared_ptr<GamesRepo> gamesRepo_;
 };

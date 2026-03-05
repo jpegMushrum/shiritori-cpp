@@ -1,7 +1,9 @@
 add_library(service STATIC
     game_session.cpp
     info_service.cpp
+    mapper.cpp
     dto/user_info.cpp
+    dto/game_info.cpp
 )
 
 target_include_directories(service PUBLIC

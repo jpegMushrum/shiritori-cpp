@@ -4,11 +4,12 @@
 
 using ull = unsigned long long;
 
-class UsersRepo {
-public:
+class UsersRepo
+{
+  public:
     UsersRepo();
 
     User getUser(ull id);
-private:
 
+  private:
 };

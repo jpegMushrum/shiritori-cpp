@@ -23,3 +23,13 @@ void InfoController::getUserInfo(ull id, std::function<void(UserInfo)> f)
             f(user);
         });
 }
+
+void InfoController::getActiveGamesInfo(std::function<void(std::vector<GameInfo>)> f)
+{
+    taskQueue_->addTask(
+        [this, f]()
+        {
+            auto user = infoService_->getActiveGamesList();
+            f(user);
+        });
+}

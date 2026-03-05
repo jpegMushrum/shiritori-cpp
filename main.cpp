@@ -16,7 +16,8 @@ using ull = unsigned long long;
 int main()
 {
     auto usersRepo = std::make_shared<UsersRepo>();
-    auto infoService = std::make_unique<InfoService>(usersRepo);
+    auto gamesRepo = std::make_shared<GamesRepo>();
+    auto infoService = std::make_unique<InfoService>(usersRepo, gamesRepo);
 
     auto taskQueue = std::make_shared<TaskQueue>(std::thread::hardware_concurrency());
     InfoController infoCtr(taskQueue, std::move(infoService));
@@ -41,13 +42,40 @@ int main()
         {
             try
             {
+                if (args.empty())
+                {
+                    std::cerr << "getUser err: no args\n";
+                    continue;
+                }
+
                 ull id = std::stoull(args[0]);
 
                 infoCtr.getUserInfo(id, [](UserInfo ui) { std::cout << ui << '\n'; });
             }
             catch (...)
             {
-                std::cerr << "getUser err: bad args";
+                std::cerr << "getUser err: bad args\n";
+            }
+
+            continue;
+        }
+
+        if (command == "getActiveGames")
+        {
+            try
+            {
+                infoCtr.getActiveGamesInfo(
+                    [](std::vector<GameInfo> gi)
+                    {
+                        for (int i = 0; i < gi.size(); i++)
+                        {
+                            std::cout << gi[i].id << "\n";
+                        }
+                    });
+            }
+            catch (...)
+            {
+                std::cerr << "getActiveGames err: bad args\n";
             }
 
             continue;
