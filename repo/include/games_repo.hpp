@@ -5,7 +5,5 @@
 class GamesRepo
 {
   public:
-    std::vector<Game> getActiveGames();
-
   private:
 };

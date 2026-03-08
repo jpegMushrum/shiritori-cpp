@@ -16,7 +16,6 @@ class InfoController
     InfoController(std::shared_ptr<TaskQueue>, std::unique_ptr<InfoService>);
 
     void getUserInfo(ull id, std::function<void(UserInfo)>);
-    void getActiveGamesInfo(std::function<void(std::vector<GameInfo>)>);
 
   private:
     std::shared_ptr<TaskQueue> taskQueue_;

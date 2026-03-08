@@ -1,6 +1,7 @@
 add_library(controller STATIC
     info_controller.cpp
     task_queue.cpp
+    games_controller.cpp
 )
 
 target_include_directories(controller PUBLIC

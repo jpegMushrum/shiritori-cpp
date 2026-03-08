@@ -14,7 +14,6 @@ class InfoService
 {
   public:
     UserInfo getUserInfo(ull playerid);
-    std::vector<GameInfo> getActiveGamesList();
 
     InfoService(std::shared_ptr<UsersRepo>, std::shared_ptr<GamesRepo>);
 

@@ -19,18 +19,3 @@ UserInfo InfoService::getUserInfo(ull id)
 
     return Mapper::UserToDto(user);
 }
-
-std::vector<GameInfo> InfoService::getActiveGamesList()
-{
-    auto games = gamesRepo_->getActiveGames();
-    std::vector<GameInfo> result(games.size());
-
-    int i = 0;
-    for (auto g : games)
-    {
-        result[i] = Mapper::GameToDto(g);
-        i++;
-    }
-
-    return result;
-}

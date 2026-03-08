@@ -1,39 +1,39 @@
-#include <functional>
-#include <thread>
-#include <memory>
-
 #include "task_queue.hpp"
 
-void TaskQueue::startWorkerLoop() {
-    while (true) {
+void TaskQueue::startWorkerLoop()
+{
+    while (true)
+    {
         std::function<void()> task;
         {
             std::unique_lock<std::mutex> lock(mu_);
-            cv_.wait(lock, [this](){ return !tasks_.empty() || stop_; });
+            cv_.wait(lock, [this]() { return !tasks_.empty() || stop_; });
 
             auto task = std::move(tasks_.front());
             tasks_.pop();
 
-            if (stop_) {
+            if (stop_)
+            {
                 break;
             }
 
             lock.unlock();
-            task();    
+            task();
             lock.lock();
         }
     }
 }
 
-TaskQueue::TaskQueue(unsigned int workersCount):
-    stop_(false)
+TaskQueue::TaskQueue(unsigned int workersCount) : stop_(false)
 {
-    for (int i = 0; i < workersCount; i++) {
+    for (int i = 0; i < workersCount; i++)
+    {
         workers_.push_back(std::make_unique<std::thread>([this]() { startWorkerLoop(); }));
     }
 }
 
-TaskQueue::~TaskQueue() {
+TaskQueue::~TaskQueue()
+{
     {
         std::lock_guard lock(mu_);
         stop_ = true;
@@ -41,18 +41,21 @@ TaskQueue::~TaskQueue() {
 
     cv_.notify_all();
 
-    for (auto& t: workers_) {
-        if (t->joinable()) {
+    for (auto& t : workers_)
+    {
+        if (t->joinable())
+        {
             t->join();
         }
     }
 }
 
-void TaskQueue::addTask(std::function<void()> cb) {
+void TaskQueue::addTask(std::function<void()> cb)
+{
     {
         std::lock_guard<std::mutex> lock(mu_);
         tasks_.push(cb);
     }
-    
+
     cv_.notify_one();
 }

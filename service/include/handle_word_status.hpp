@@ -1,0 +1,16 @@
+#pragma once
+
+enum HandleWordStatus
+{
+    OK,
+    ERROR,
+    WRONG_ORDER,
+    NOT_JAPANESE_WORD,
+    DICT_NOT_ANSWER,
+    NO_SPEACH_PART,
+    NO_FOUND_WORD,
+    GOT_END_WORD,
+    GOT_DOUBLED_WORD,
+    CANT_JOIN_WORDS,
+    GAME_NOT_FOUND,
+};

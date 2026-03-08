@@ -11,5 +11,5 @@ UserInfo Mapper::UserToDto(User user)
 
 GameInfo Mapper::GameToDto(Game game)
 {
-    return GameInfo(game.id);
+    return GameInfo(game.id, 0, 0, 16);
 }

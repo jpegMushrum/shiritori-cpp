@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "games_controller.hpp"
 #include "info_controller.hpp"
 #include "info_service.hpp"
 #include "task_queue.hpp"
@@ -21,6 +22,8 @@ int main()
 
     auto taskQueue = std::make_shared<TaskQueue>(std::thread::hardware_concurrency());
     InfoController infoCtr(taskQueue, std::move(infoService));
+
+    GamesController gamesCtr(taskQueue);
 
     while (true)
     {
@@ -64,18 +67,32 @@ int main()
         {
             try
             {
-                infoCtr.getActiveGamesInfo(
+                gamesCtr.GetActiveGames(
                     [](std::vector<GameInfo> gi)
                     {
                         for (int i = 0; i < gi.size(); i++)
                         {
-                            std::cout << gi[i].id << "\n";
+                            std::cout << gi[i] << "\n";
                         }
                     });
             }
             catch (...)
             {
                 std::cerr << "getActiveGames err: bad args\n";
+            }
+
+            continue;
+        }
+
+        if (command == "startNewGame")
+        {
+            try
+            {
+                gamesCtr.StartNewGame([](ull gameId) { std::cout << gameId << '\n'; });
+            }
+            catch (...)
+            {
+                std::cerr << "startNewGame err: bad args\n";
             }
 
             continue;
