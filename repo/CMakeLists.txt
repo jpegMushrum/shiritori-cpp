@@ -13,4 +13,4 @@ target_include_directories(repo PUBLIC
 )
 
 target_link_libraries(repo PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(repo PRIVATE ${CURL_LIBRARIES})
+target_link_libraries(repo PRIVATE CURL::libcurl)

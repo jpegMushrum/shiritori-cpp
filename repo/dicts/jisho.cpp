@@ -1,11 +1,14 @@
 
-#include <curl/curl.h>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 #include "jisho.hpp"
 
 using json = nlohmann::json;
+
+JishoDict::JishoDict()
+{
+    std::cout << "jisho created\n";
+}
 
 size_t JishoDict::WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {

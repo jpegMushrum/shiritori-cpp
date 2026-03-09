@@ -1,4 +1,7 @@
 #pragma once
 
-class Word {
+class Word
+{
+  public:
+    Word();
 };

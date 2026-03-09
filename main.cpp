@@ -4,7 +4,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <windows.h>
 
+#include "game_fabric.hpp"
 #include "games_controller.hpp"
 #include "info_controller.hpp"
 #include "info_service.hpp"
@@ -12,24 +14,25 @@
 #include "task_queue.hpp"
 #include "user_info.hpp"
 #include "users_repo.hpp"
-#include <windows.h>
 
 using ull = unsigned long long;
 
 int main()
 {
+    std::cout << "D|!\n";
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
 
-    auto dict = JishoDict();
+    auto jisho = std::make_shared<JishoDict>();
     auto usersRepo = std::make_shared<UsersRepo>();
     auto gamesRepo = std::make_shared<GamesRepo>();
+
     auto infoService = std::make_unique<InfoService>(usersRepo, gamesRepo);
+    auto gameFabric = std::make_unique<GameFabric>(jisho);
 
     auto taskQueue = std::make_shared<TaskQueue>(std::thread::hardware_concurrency());
     InfoController infoCtr(taskQueue, std::move(infoService));
-
-    GamesController gamesCtr(taskQueue);
+    GamesController gamesCtr(taskQueue, std::move(gameFabric));
 
     while (true)
     {
@@ -104,7 +107,7 @@ int main()
             continue;
         }
 
-        if (command == "searchWord")
+        if (command == "handleWord")
         {
             try
             {
@@ -114,10 +117,12 @@ int main()
                     continue;
                 }
 
-                std::string word = args[0];
-                std::cout << "dmain| " << word << '\n';
+                ull userId = std::stoull(args[0]);
+                ull gameId = std::stoull(args[1]);
+                std::string word = args[2];
 
-                dict.SearchWord(word);
+                gamesCtr.HandleWord(userId, gameId, word,
+                                    [](HandleWordStatus status) { std::cout << status << '\n'; });
             }
             catch (...)
             {

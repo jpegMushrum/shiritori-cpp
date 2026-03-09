@@ -1,5 +1,6 @@
 add_library(service STATIC
     game_session.cpp
+    game_fabric.cpp
     info_service.cpp
     mapper.cpp
     dto/user_info.cpp

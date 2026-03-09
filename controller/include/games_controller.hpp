@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "game_fabric.hpp"
 #include "game_info.hpp"
 #include "game_session.hpp"
 #include "handle_word_status.hpp"
@@ -18,7 +19,7 @@ using ull = unsigned long long;
 class GamesController
 {
   public:
-    GamesController(std::shared_ptr<TaskQueue>);
+    GamesController(std::shared_ptr<TaskQueue>, std::unique_ptr<GameFabric>);
 
     void StartNewGame(std::function<void(ull)>);
     void HandleWord(ull, ull, std::string, std::function<void(HandleWordStatus)>);
@@ -27,6 +28,7 @@ class GamesController
   private:
     std::unordered_map<ull, std::shared_ptr<GameSession>> activeGames_;
     std::shared_ptr<TaskQueue> taskQueue_;
+    std::unique_ptr<GameFabric> gameFabric_;
     ull nextGameId_;
 
     mutable std::shared_mutex mu_;

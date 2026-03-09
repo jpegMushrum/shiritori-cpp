@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_set>
@@ -7,6 +8,7 @@
 
 #include "game_info.hpp"
 #include "handle_word_status.hpp"
+#include "jisho.hpp"
 #include "user.hpp"
 #include "word.hpp"
 
@@ -19,11 +21,13 @@ class GameSession
     HandleWordStatus handleWord(ull, const std::string&);
 
     GameInfo GetInfo();
-    GameSession(ull);
+    GameSession(ull, std::shared_ptr<JishoDict>);
 
   private:
     std::unordered_set<ull> players_;
     std::vector<Word> words_;
+
+    std::shared_ptr<JishoDict> dict_;
 
     std::mutex mu_;
     GameInfo info_;

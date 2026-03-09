@@ -1,11 +1,14 @@
 #pragma once
 
-#include "dictionary.hpp"
+#include <curl/curl.h>
+#include <nlohmann/json.hpp>
+
 #include "word.hpp"
 
-class JishoDict : IDictionary
+class JishoDict
 {
   public:
+    JishoDict();
     Word SearchWord(const std::string&);
 
   private:

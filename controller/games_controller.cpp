@@ -1,7 +1,8 @@
 #include "games_controller.hpp"
 
-GamesController::GamesController(std::shared_ptr<TaskQueue> taskQueue)
-    : taskQueue_(taskQueue), nextGameId_(0)
+GamesController::GamesController(std::shared_ptr<TaskQueue> taskQueue,
+                                 std::unique_ptr<GameFabric> gameFabric)
+    : taskQueue_(taskQueue), nextGameId_(0), gameFabric_(std::move(gameFabric))
 {
 }
 
@@ -13,7 +14,8 @@ void GamesController::StartNewGame(std::function<void(ull)> f)
             std::unique_lock lock(mu_);
 
             ull id = nextGameId_++;
-            activeGames_[id] = std::make_shared<GameSession>(id);
+
+            activeGames_[id] = gameFabric_->createGame(id);
             lock.unlock();
 
             f(id);

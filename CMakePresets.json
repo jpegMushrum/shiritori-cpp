@@ -3,11 +3,11 @@
     "configurePresets": [
         {
             "name": "vcpkg",
-            "generator": "Ninja",
+            "generator": "Visual Studio 18 2026",
+            "architecture": "x64",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "D:/Programming/vcpkg/scripts/buildsystems/vcpkg.cmake",
-                "VCPKG_TARGET_TRIPLET": "x64-mingw-static"
+                "CMAKE_TOOLCHAIN_FILE": "D:/Programming/vcpkg/scripts/buildsystems/vcpkg.cmake"
             }
         }
     ]

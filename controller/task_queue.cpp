@@ -9,13 +9,17 @@ void TaskQueue::startWorkerLoop()
             std::unique_lock<std::mutex> lock(mu_);
             cv_.wait(lock, [this]() { return !tasks_.empty() || stop_; });
 
-            auto task = std::move(tasks_.front());
-            tasks_.pop();
-
-            if (stop_)
+            if (tasks_.empty())
             {
-                break;
+                if (stop_)
+                {
+                    break;
+                }
+                continue;
             }
+
+            task = std::move(tasks_.front());
+            tasks_.pop();
 
             lock.unlock();
             task();

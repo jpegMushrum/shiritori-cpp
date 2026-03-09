@@ -3,7 +3,7 @@
 enum HandleWordStatus
 {
     OK,
-    ERROR,
+    GOT_ERROR,
     WRONG_ORDER,
     NOT_JAPANESE_WORD,
     DICT_NOT_ANSWER,
