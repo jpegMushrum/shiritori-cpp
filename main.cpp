@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -23,8 +24,10 @@ int main()
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
 
+    std::string usersDbPath = (std::filesystem::current_path() / "data" / "usersDb.db").string();
+
     auto jisho = std::make_shared<JishoDict>();
-    auto usersRepo = std::make_shared<UsersRepo>();
+    auto usersRepo = std::make_shared<UsersRepo>(usersDbPath);
     auto gamesRepo = std::make_shared<GamesRepo>();
 
     auto infoService = std::make_unique<InfoService>(usersRepo, gamesRepo);
@@ -63,6 +66,28 @@ int main()
                 ull id = std::stoull(args[0]);
 
                 infoCtr.getUserInfo(id, [](UserInfo ui) { std::cout << ui << '\n'; });
+            }
+            catch (...)
+            {
+                std::cerr << "getUser err: bad args\n";
+            }
+
+            continue;
+        }
+
+        if (command == "addUser")
+        {
+            try
+            {
+                if (args.size() < 1)
+                {
+                    std::cerr << "addUser err: no args\n";
+                    continue;
+                }
+
+                std::string nickname = args[0];
+
+                infoCtr.addUser(nickname, [](ull userId) { std::cout << userId << '\n'; });
             }
             catch (...)
             {

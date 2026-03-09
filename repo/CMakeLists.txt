@@ -15,3 +15,5 @@ target_include_directories(repo PUBLIC
 
 target_link_libraries(repo PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(repo PRIVATE CURL::libcurl)
+target_link_libraries(repo PRIVATE unofficial::sqlite3::sqlite3)
+

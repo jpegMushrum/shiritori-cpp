@@ -1,6 +1,4 @@
 #include "info_controller.hpp"
-#include "task_queue.hpp"
-#include "user_info.hpp"
 
 InfoController::InfoController(std::shared_ptr<TaskQueue> queue,
                                std::unique_ptr<InfoService> infoService)
@@ -15,5 +13,22 @@ void InfoController::getUserInfo(ull id, std::function<void(UserInfo)> f)
         {
             auto user = infoService_->getUserInfo(id);
             f(user);
+        });
+}
+
+void InfoController::addUser(const std::string& nickname, std::function<void(ull)> f)
+{
+    taskQueue_->addTask(
+        [this, nickname, f]()
+        {
+            try
+            {
+                auto userId = infoService_->addUser(nickname);
+                f(userId);
+            }
+            catch (std::runtime_error e)
+            {
+                std::cerr << e.what() << '\n';
+            }
         });
 }

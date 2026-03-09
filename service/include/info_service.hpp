@@ -13,7 +13,8 @@ using ull = unsigned long long;
 class InfoService
 {
   public:
-    UserInfo getUserInfo(ull playerid);
+    UserInfo getUserInfo(ull);
+    ull addUser(const std::string&);
 
     InfoService(std::shared_ptr<UsersRepo>, std::shared_ptr<GamesRepo>);
 

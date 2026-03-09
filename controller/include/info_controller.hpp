@@ -15,7 +15,8 @@ class InfoController
   public:
     InfoController(std::shared_ptr<TaskQueue>, std::unique_ptr<InfoService>);
 
-    void getUserInfo(ull id, std::function<void(UserInfo)>);
+    void getUserInfo(ull, std::function<void(UserInfo)>);
+    void addUser(const std::string&, std::function<void(ull)>);
 
   private:
     std::shared_ptr<TaskQueue> taskQueue_;

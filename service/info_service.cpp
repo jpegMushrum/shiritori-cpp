@@ -19,3 +19,12 @@ UserInfo InfoService::getUserInfo(ull id)
 
     return Mapper::UserToDto(user);
 }
+
+ull InfoService::addUser(const std::string& nickname)
+{
+
+    User newUser(0, nickname, 0);
+    ull id = usersRepo_->addUser(newUser);
+
+    return id;
+}

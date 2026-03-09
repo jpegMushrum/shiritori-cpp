@@ -2,8 +2,9 @@
   "name": "shiritori-cpp",
   "version": "0.1.0",
   "dependencies": [
+    "boost",
     "curl",
     "nlohmann-json",
-    "boost"
+    "sqlite3"
   ]
 }

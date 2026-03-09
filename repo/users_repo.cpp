@@ -1,14 +1,122 @@
-#include "users_repo.hpp"
+#include <sqlite3.h>
+#include <stdexcept>
+
 #include "user.hpp"
+#include "users_repo.hpp"
 
 using ull = unsigned long long;
 
-UsersRepo::UsersRepo() {
-
+UsersRepo::UsersRepo(std::string path) : dbPath_(path)
+{
+    initDb();
 }
 
-User UsersRepo::getUser(ull id) {
-    User result(id);
+void UsersRepo::initDb()
+{
+    const std::string sql = R"(
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nickname TEXT NOT NULL,
+                words_awg REAL DEFAULT 0
+            );
+        )";
 
-    return result;
+    sqlite3* db;
+    if (sqlite3_open(dbPath_.c_str(), &db) != SQLITE_OK)
+        throw std::runtime_error("Cannot open DB");
+
+    sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
+
+    char* errMsg = nullptr;
+    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
+    {
+        std::string err = errMsg ? errMsg : "Unknown error";
+        sqlite3_free(errMsg);
+        sqlite3_close(db);
+        throw std::runtime_error(err);
+    }
+
+    sqlite3_close(db);
+}
+
+User UsersRepo::getUser(ull id)
+{
+    sqlite3* db;
+    if (sqlite3_open(dbPath_.c_str(), &db) != SQLITE_OK)
+        throw std::runtime_error("Cannot open DB");
+
+    sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
+
+    sqlite3_stmt* stmt;
+    sqlite3_prepare_v2(db, "SELECT id, nickname, words_awg FROM users WHERE id=?;", -1, &stmt,
+                       nullptr);
+    sqlite3_bind_int(stmt, 1, id);
+
+    User user;
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        ull id = sqlite3_column_int(stmt, 0);
+        std::string nickname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        double words_awg = sqlite3_column_double(stmt, 2);
+        user = User(id, nickname, words_awg);
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return user;
+}
+
+ull UsersRepo::addUser(User user)
+{
+    sqlite3* db;
+    if (sqlite3_open(dbPath_.c_str(), &db) != SQLITE_OK)
+        throw std::runtime_error("Cannot open DB");
+
+    sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
+
+    sqlite3_stmt* stmt;
+    sqlite3_prepare_v2(db, "INSERT INTO users (nickname, words_awg) VALUES (?, ?)", -1, &stmt,
+                       nullptr);
+
+    sqlite3_bind_text(stmt, 1, user.nickname.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_double(stmt, 2, user.words_awg);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        throw std::runtime_error("Insert failed");
+    }
+    ull lastId = (ull)sqlite3_last_insert_rowid(db);
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return lastId;
+}
+
+void UsersRepo::changeUser(User user)
+{
+    sqlite3* db;
+    if (sqlite3_open(dbPath_.c_str(), &db) != SQLITE_OK)
+        throw std::runtime_error("Cannot open DB");
+
+    sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
+
+    sqlite3_stmt* stmt;
+    sqlite3_prepare_v2(db, "UPDATE users SET nickname = ?, words_awg = ? WHERE id = ?", -1, &stmt,
+                       nullptr);
+    sqlite3_bind_text(stmt, 1, user.nickname.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_double(stmt, 2, user.words_awg);
+    sqlite3_bind_int(stmt, 3, user.id);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        throw std::runtime_error("Update failed");
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
 }
