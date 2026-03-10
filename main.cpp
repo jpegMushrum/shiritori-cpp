@@ -29,7 +29,7 @@ using ull = unsigned long long;
 
 /*
     Что добавить еще:
-        - gameSession::endSession, чтобы записывал в gamesRepo результаты
+        - (Done) gameSession::endSession, чтобы записывал в gamesRepo результаты
         - gameSession.admin для созранения создателя игры
         - gameSession.lastPlayer для сохранения очередности
 */
@@ -117,7 +117,7 @@ int main()
             try
             {
                 gamesCtr.GetActiveGames(
-                    [](std::vector<GameSessionInfo> gi)
+                    [](std::vector<GameContext> gi)
                     {
                         for (int i = 0; i < gi.size(); i++)
                         {

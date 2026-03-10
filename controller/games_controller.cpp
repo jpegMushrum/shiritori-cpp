@@ -48,12 +48,12 @@ void GamesController::HandleWord(ull gameId, ull userId, std::string word,
         });
 }
 
-void GamesController::GetActiveGames(std::function<void(std::vector<GameSessionInfo>)> f)
+void GamesController::GetActiveGames(std::function<void(std::vector<GameContext>)> f)
 {
     taskQueue_->addTask(
         [this, f]()
         {
-            std::vector<GameSessionInfo> result;
+            std::vector<GameContext> result;
 
             {
                 std::shared_lock lock(mu_);

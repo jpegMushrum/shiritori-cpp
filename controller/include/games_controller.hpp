@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
+#include "game_context.hpp"
 #include "game_fabric.hpp"
 #include "game_session.hpp"
-#include "game_session_info.hpp"
 #include "handle_word_status.hpp"
 #include "task_queue.hpp"
 
@@ -23,7 +23,7 @@ class GamesController
 
     void StartNewGame(std::function<void(ull)>);
     void HandleWord(ull, ull, std::string, std::function<void(HandleWordStatus)>);
-    void GetActiveGames(std::function<void(std::vector<GameSessionInfo>)>);
+    void GetActiveGames(std::function<void(std::vector<GameContext>)>);
 
   private:
     std::unordered_map<ull, std::shared_ptr<GameSession>> activeGames_;

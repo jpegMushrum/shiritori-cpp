@@ -5,7 +5,7 @@
 using ull = unsigned long long;
 
 GameSession::GameSession(ull id, std::shared_ptr<IDictionary> dict, std::shared_ptr<GamesRepo> repo)
-    : info_(id, 0, 0), dict_(dict), repo_(repo), stop_(false)
+    : ctx_(id, 0, 0), dict_(dict), repo_(repo), stop_(false)
 {
 }
 
@@ -32,7 +32,7 @@ void GameSession::saveStats()
     int place = 1;
     for (auto& usr : players)
     {
-        gameParts.push_back(Game(info_.id, usr.userId, usr.score, place));
+        gameParts.push_back(Game(ctx_.id, usr.userId, usr.score, place));
         ++place;
     }
 
@@ -47,7 +47,7 @@ void GameSession::addUser(ull id)
     player.userId = id;
 
     players_.emplace(player);
-    info_.playersCount++;
+    ctx_.playersCount++;
 }
 
 HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
@@ -68,8 +68,8 @@ HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
     return HandleWordStatus::OK;
 }
 
-GameSessionInfo GameSession::GetInfo()
+GameContext GameSession::GetInfo()
 {
     std::lock_guard lock(mu_);
-    return info_;
+    return ctx_;
 }

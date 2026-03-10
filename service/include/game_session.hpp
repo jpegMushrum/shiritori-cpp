@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "game.hpp"
-#include "game_session_info.hpp"
+#include "game_context.hpp"
 #include "games_repo.hpp"
 #include "handle_word_status.hpp"
 #include "jisho.hpp"
@@ -29,7 +29,7 @@ class GameSession
     HandleWordStatus handleWord(ull, const std::string&);
     void stopGame();
 
-    GameSessionInfo GetInfo();
+    GameContext GetInfo();
 
   private:
     std::unordered_set<PlayerScore> players_;
@@ -41,5 +41,5 @@ class GameSession
 
     bool stop_;
     std::mutex mu_;
-    GameSessionInfo info_;
+    GameContext ctx_;
 };
