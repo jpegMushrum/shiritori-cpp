@@ -4,7 +4,8 @@ add_library(service STATIC
     info_service.cpp
     mapper.cpp
     dto/user_info.cpp
-    dto/game_info.cpp
+    game_info.cpp
+    player_score.cpp
 )
 
 target_include_directories(service PUBLIC

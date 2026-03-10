@@ -13,4 +13,5 @@ enum HandleWordStatus
     GOT_DOUBLED_WORD,
     CANT_JOIN_WORDS,
     GAME_NOT_FOUND,
+    GAME_STOPPED,
 };

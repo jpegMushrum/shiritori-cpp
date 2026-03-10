@@ -23,8 +23,15 @@ using ull = unsigned long long;
     Планы на сегодня:
         - (Done) Исправить модель юзера на количество игр и кол-во слов вместо awg
         - (Done) Сделать репозиторий игр
-        - Распарсить ответ от jisho
+        - (Done) Распарсить ответ от jisho
         - Добавить игровую логику
+*/
+
+/*
+    Что добавить еще:
+        - gameSession::endSession, чтобы записывал в gamesRepo результаты
+        - gameSession.admin для созранения создателя игры
+        - gameSession.lastPlayer для сохранения очередности
 */
 
 int main()
@@ -39,7 +46,7 @@ int main()
     auto gamesRepo = std::make_shared<GamesRepo>(dbPath);
 
     auto infoService = std::make_unique<InfoService>(usersRepo, gamesRepo);
-    auto gameFabric = std::make_unique<GameFabric>(jisho);
+    auto gameFabric = std::make_unique<GameFabric>(jisho, gamesRepo);
 
     auto taskQueue = std::make_shared<TaskQueue>(std::thread::hardware_concurrency());
     InfoController infoCtr(taskQueue, std::move(infoService));
