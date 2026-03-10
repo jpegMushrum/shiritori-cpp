@@ -18,7 +18,7 @@ void GameSession::addUser(ull id)
 
 HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
 {
-    std::promise<Word> promise;
+    std::promise<std::vector<Word>> promise;
     auto future =
         std::async(std::launch::async, [this, word]() { return dict_->SearchWord(word); });
 

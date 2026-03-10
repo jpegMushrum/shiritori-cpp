@@ -144,9 +144,9 @@ int main()
         {
             try
             {
-                if (args.empty())
+                if (args.size() < 3)
                 {
-                    std::cerr << "searchWord err: no args\n";
+                    std::cerr << "searchWord err: bad args\n";
                     continue;
                 }
 

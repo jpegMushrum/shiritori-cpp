@@ -3,8 +3,6 @@
 
 #include "jisho.hpp"
 
-using json = nlohmann::json;
-
 size_t JishoDict::WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
     size_t totalSize = size * nmemb;
@@ -13,7 +11,7 @@ size_t JishoDict::WriteCallback(void* contents, size_t size, size_t nmemb, void*
     return totalSize;
 }
 
-Word JishoDict::SearchWord(const std::string& word)
+std::vector<Word> JishoDict::SearchWord(const std::string& word)
 {
     CURL* curl = curl_easy_init();
     if (!curl)
@@ -47,7 +45,53 @@ Word JishoDict::SearchWord(const std::string& word)
         throw std::runtime_error(std::string("cURL error: ") + curl_easy_strerror(res));
     }
 
-    std::cout << "d| " << response << '\n';
     auto jsonResponse = json::parse(response);
-    return Word();
+
+    return jsonToWords(jsonResponse);
+}
+
+std::vector<Word> JishoDict::jsonToWords(json& obj)
+{
+    std::vector<Word> result(0);
+
+    for (auto& entry : obj["data"])
+    {
+        Word word;
+
+        for (auto& jp : entry["japanese"])
+        {
+            if (jp.contains("word") && word.kanji == "")
+            {
+                word.kanji = jp["word"];
+            }
+
+            if (jp.contains("reading"))
+            {
+                word.readings.emplace(jp["reading"]);
+            }
+        }
+
+        for (auto& sn : entry["senses"])
+        {
+            for (auto& def : sn["english_definitions"])
+            {
+                if (word.meaning != "")
+                {
+                    word.meaning = std::string(def);
+                }
+                else
+                {
+                    word.meaning += "\n" + std::string(def);
+                }
+            }
+
+            for (auto& pos : sn["parts_of_speech"])
+            {
+                word.partsOfSpeach.emplace(pos);
+            }
+        }
+
+        result.push_back(word);
+    }
+    return result;
 }
