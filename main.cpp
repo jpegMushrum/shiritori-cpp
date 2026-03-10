@@ -117,7 +117,7 @@ int main()
             try
             {
                 gamesCtr.GetActiveGames(
-                    [](std::vector<GameInfo> gi)
+                    [](std::vector<GameSessionInfo> gi)
                     {
                         for (int i = 0; i < gi.size(); i++)
                         {

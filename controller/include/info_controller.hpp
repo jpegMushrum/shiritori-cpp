@@ -3,7 +3,6 @@
 #include <functional>
 #include <vector>
 
-#include "game_info.hpp"
 #include "info_service.hpp"
 #include "task_queue.hpp"
 #include "user_info.hpp"

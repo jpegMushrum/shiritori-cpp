@@ -68,7 +68,7 @@ HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
     return HandleWordStatus::OK;
 }
 
-GameInfo GameSession::GetInfo()
+GameSessionInfo GameSession::GetInfo()
 {
     std::lock_guard lock(mu_);
     return info_;

@@ -13,5 +13,5 @@ class Mapper
     Mapper() = delete;
 
     static UserInfo UserToDto(User);
-    static GameInfo GameToDto(std::vector<Game>);
+    static GameInfo GameToDto(Game);
 };

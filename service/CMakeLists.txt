@@ -3,9 +3,10 @@ add_library(service STATIC
     game_fabric.cpp
     info_service.cpp
     mapper.cpp
-    dto/user_info.cpp
-    game_info.cpp
+    game_session_info.cpp
     player_score.cpp
+    dto/user_info.cpp
+    dto/game_info.cpp
 )
 
 target_include_directories(service PUBLIC
