@@ -1,9 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <boost/locale.hpp>
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <string>
 #include <unordered_set>
 #include <vector>

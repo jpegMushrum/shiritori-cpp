@@ -21,9 +21,10 @@ class GamesController
   public:
     GamesController(std::shared_ptr<TaskQueue>, std::unique_ptr<GameFabric>);
 
-    void StartNewGame(ull, std::function<void(ull)>);
+    void StartNewGame(ull, std::function<void(GameContext)>);
     void HandleWord(ull, ull, std::string, std::function<void(HandleWordStatus)>);
     void GetActiveGames(std::function<void(std::vector<GameContext>)>);
+    void AddPlayerToGame(ull, ull);
 
   private:
     std::unordered_map<ull, std::shared_ptr<GameSession>> activeGames_;

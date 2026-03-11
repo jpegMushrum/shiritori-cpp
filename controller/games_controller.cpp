@@ -6,19 +6,23 @@ GamesController::GamesController(std::shared_ptr<TaskQueue> taskQueue,
 {
 }
 
-void GamesController::StartNewGame(ull adminId, std::function<void(ull)> f)
+void GamesController::StartNewGame(ull adminId, std::function<void(GameContext)> f)
 {
     taskQueue_->addTask(
         [this, adminId, f]()
         {
-            std::unique_lock lock(mu_);
+            ull id;
+            GameContext info;
+            {
+                std::unique_lock lock(mu_);
 
-            ull id = nextGameId_++;
+                id = nextGameId_++;
 
-            activeGames_[id] = gameFabric_->createGame(id, adminId);
-            lock.unlock();
+                activeGames_[id] = gameFabric_->createGame(id, adminId);
+                info = activeGames_[id]->GetInfo();
+            }
 
-            f(id);
+            f(info);
         });
 }
 
@@ -67,5 +71,21 @@ void GamesController::GetActiveGames(std::function<void(std::vector<GameContext>
             }
 
             f(result);
+        });
+}
+
+void GamesController::AddPlayerToGame(ull userId, ull gameId)
+{
+    taskQueue_->addTask(
+        [this, userId, gameId]()
+        {
+            std::shared_lock lock(mu_);
+            auto game = activeGames_.find(gameId);
+            if (game == activeGames_.end())
+            {
+                return;
+            }
+
+            game->second->addUser(userId);
         });
 }

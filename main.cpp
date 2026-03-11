@@ -117,11 +117,11 @@ int main()
             try
             {
                 gamesCtr.GetActiveGames(
-                    [](std::vector<GameContext> gi)
+                    [](std::vector<GameContext> gc)
                     {
-                        for (int i = 0; i < gi.size(); i++)
+                        for (int i = 0; i < gc.size(); i++)
                         {
-                            std::cout << gi[i] << "\n";
+                            std::cout << gc[i] << "\n";
                         }
                     });
             }
@@ -137,7 +137,38 @@ int main()
         {
             try
             {
-                gamesCtr.StartNewGame([](ull gameId) { std::cout << gameId << '\n'; });
+                if (args.size() < 1)
+                {
+                    std::cerr << "searchWord err: bad args\n";
+                    continue;
+                }
+
+                ull userId = std::stoull(args[0]);
+
+                gamesCtr.StartNewGame(userId, [](GameContext gc) { std::cout << gc << '\n'; });
+            }
+            catch (...)
+            {
+                std::cerr << "startNewGame err: bad args\n";
+            }
+
+            continue;
+        }
+
+        if (command == "addPlayerToGame")
+        {
+            try
+            {
+                if (args.size() < 2)
+                {
+                    std::cerr << "searchWord err: bad args\n";
+                    continue;
+                }
+
+                ull userId = std::stoull(args[0]);
+                ull gameId = std::stoull(args[1]);
+
+                gamesCtr.AddPlayerToGame(userId, gameId);
             }
             catch (...)
             {
@@ -157,11 +188,11 @@ int main()
                     continue;
                 }
 
-                ull userId = std::stoull(args[0]);
-                ull gameId = std::stoull(args[1]);
+                ull gameId = std::stoull(args[0]);
+                ull userId = std::stoull(args[1]);
                 std::string word = args[2];
 
-                gamesCtr.HandleWord(userId, gameId, word,
+                gamesCtr.HandleWord(gameId, userId, word,
                                     [](HandleWordStatus status) { std::cout << status << '\n'; });
             }
             catch (...)

@@ -1,7 +1,8 @@
 #pragma once
 
+#include <boost/locale.hpp>
 #include <iostream>
-#include <uchar.h>
+#include <string>
 
 using ull = unsigned long long;
 
@@ -9,7 +10,7 @@ class GameContext
 {
   public:
     GameContext();
-    GameContext(ull, int, int, ull);
+    GameContext(ull, int, int, ull, char32_t);
 
     ull id;
     int wordsCount;

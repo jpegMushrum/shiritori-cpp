@@ -1,13 +1,30 @@
 #include "game_session.hpp"
 
-#include <boost/locale.hpp>
-
 using ull = unsigned long long;
+
+char32_t getRandomKana()
+{
+    static const std::vector<char32_t> allowedHiragana = {
+        U'あ', U'い', U'う', U'え', U'お', U'か', U'き', U'く', U'け', U'こ', U'さ', U'し',
+        U'す', U'せ', U'そ', U'た', U'ち', U'つ', U'て', U'と', U'な', U'に', U'ぬ', U'ね',
+        U'の', U'は', U'ひ', U'ふ', U'へ', U'ほ', U'ま', U'み', U'む', U'め', U'も', U'や',
+        U'ゆ', U'よ', U'ら', U'り', U'る', U'れ', U'ろ', U'わ', U'が', U'ぎ', U'ぐ', U'げ',
+        U'ご', U'ざ', U'じ', U'ず', U'ぜ', U'ぞ', U'だ', U'で', U'ど', U'ば', U'び', U'ぶ',
+        U'べ', U'ぼ', U'ぱ', U'ぴ', U'ぷ', U'ぺ', U'ぽ',
+    };
+
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, allowedHiragana.size() - 1);
+
+    return allowedHiragana[dist(gen)];
+}
 
 GameSession::GameSession(ull id, ull adminId, std::shared_ptr<IDictionary> dict,
                          std::shared_ptr<GamesRepo> repo)
-    : ctx_(id, 0, 0, adminId), dict_(dict), repo_(repo), stop_(false)
+    : dict_(dict), repo_(repo), stop_(false)
 {
+    ctx_ = GameContext(id, 0, 0, adminId, getRandomKana());
 }
 
 void GameSession::stopGame()
@@ -55,130 +72,6 @@ GameContext GameSession::GetInfo()
 {
     std::lock_guard lock(mu_);
     return ctx_;
-}
-
-HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
-{
-    std::u32string u32word = conv_utf8_to_utf32(word);
-
-    {
-        std::lock_guard lock(mu_);
-        if (stop_)
-        {
-            return HandleWordStatus::GAME_STOPPED;
-        }
-
-        auto it = players_.find({id});
-        if (it == players_.end())
-        {
-            return HandleWordStatus::NO_FOUND_PLAYER;
-        }
-        PlayerScore ps = *it;
-
-        if (ctx_.lastPlayerId == id)
-        {
-            return HandleWordStatus::WRONG_ORDER;
-        }
-
-        if (!isJapaneseWord(u32word))
-        {
-            return HandleWordStatus::NOT_JAPANESE_WORD;
-        }
-
-        std::optional<char32_t> firstKana = getFirstKana(u32word);
-        if (!firstKana || ctx_.lastKana != toHiragana(*firstKana))
-        {
-            return HandleWordStatus::CANT_JOIN_WORDS;
-        }
-
-        if (isWordDoubled(word, words_))
-        {
-            return HandleWordStatus::GOT_DOUBLED_WORD;
-        }
-    }
-
-    std::vector<Word> response;
-    try
-    {
-        response = dict_->SearchWord(word);
-    }
-    catch (const std::exception& e)
-    {
-        return HandleWordStatus::NO_FOUND_WORD;
-    }
-
-    {
-        std::lock_guard lock(mu_);
-
-        auto it = players_.find({id});
-        if (it == players_.end())
-        {
-            return HandleWordStatus::NO_FOUND_PLAYER;
-        }
-        PlayerScore ps = *it;
-
-        if (ctx_.lastPlayerId == id)
-        {
-            return HandleWordStatus::WRONG_ORDER;
-        }
-
-        if (!isJapaneseWord(u32word))
-        {
-            return HandleWordStatus::NOT_JAPANESE_WORD;
-        }
-
-        std::optional<char32_t> firstKana = getFirstKana(u32word);
-        if (!firstKana || ctx_.lastKana != toHiragana(*firstKana))
-        {
-            return HandleWordStatus::CANT_JOIN_WORDS;
-        }
-
-        if (isWordDoubled(word, words_))
-        {
-            return HandleWordStatus::GOT_DOUBLED_WORD;
-        }
-
-        std::optional<Word> relevantWord = findRelevantWord(word, response);
-        if (!relevantWord)
-        {
-            return HandleWordStatus::NO_FOUND_WORD;
-        }
-        Word wordInfo = *relevantWord;
-
-        if (wordInfo.partsOfSpeach.contains("Noun"))
-        {
-            return HandleWordStatus::NO_SPEACH_PART;
-        }
-
-        auto reading = conv_utf8_to_utf32(*wordInfo.readings.begin());
-        std::optional<char32_t> lastKanaOpt = getLastKana(reading);
-        if (!lastKanaOpt)
-        {
-            return HandleWordStatus::GOT_ERROR;
-        }
-        char32_t lastKana = *lastKanaOpt;
-        lastKana = toHiragana(lastKana);
-
-        if (lastKana == U'ん')
-        {
-            stop_ = true;
-            return HandleWordStatus::GOT_END_WORD;
-        }
-
-        // Now all filters were passed and words is good
-
-        ctx_.lastPlayerId = id;
-        ctx_.lastKana = lastKana;
-
-        ps.score++;
-
-        players_.erase(it);
-        players_.insert(ps);
-
-        words_.emplace_back(wordInfo);
-
-        return HandleWordStatus::OK;
-    }
 }
 
 char32_t toHiragana(char32_t c)
@@ -311,4 +204,135 @@ std::optional<char32_t> getFirstKana(const std::u32string& u32)
     }
 
     return std::nullopt;
+}
+
+HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
+{
+    std::u32string u32word = conv_utf8_to_utf32(word);
+
+    {
+        std::lock_guard lock(mu_);
+        if (stop_)
+        {
+            return HandleWordStatus::GAME_STOPPED;
+        }
+
+        auto it = players_.find({id});
+        if (it == players_.end())
+        {
+            return HandleWordStatus::NO_FOUND_PLAYER;
+        }
+        PlayerScore ps = *it;
+
+        if (ctx_.lastPlayerId == id)
+        {
+            return HandleWordStatus::WRONG_ORDER;
+        }
+
+        if (!isJapaneseWord(u32word))
+        {
+            return HandleWordStatus::NOT_JAPANESE_WORD;
+        }
+
+        if (isWordDoubled(word, words_))
+        {
+            return HandleWordStatus::GOT_DOUBLED_WORD;
+        }
+    }
+
+    std::vector<Word> response;
+    try
+    {
+        response = dict_->SearchWord(word);
+    }
+    catch (const std::exception& e)
+    {
+        return HandleWordStatus::NO_FOUND_WORD;
+    }
+
+    {
+        std::lock_guard lock(mu_);
+
+        auto it = players_.find({id});
+        if (it == players_.end())
+        {
+            return HandleWordStatus::NO_FOUND_PLAYER;
+        }
+        PlayerScore ps = *it;
+
+        if (ctx_.lastPlayerId == id)
+        {
+            return HandleWordStatus::WRONG_ORDER;
+        }
+
+        if (!isJapaneseWord(u32word))
+        {
+            return HandleWordStatus::NOT_JAPANESE_WORD;
+        }
+
+        if (isWordDoubled(word, words_))
+        {
+            return HandleWordStatus::GOT_DOUBLED_WORD;
+        }
+
+        std::optional<Word> relevantWord = findRelevantWord(word, response);
+        if (!relevantWord)
+        {
+            return HandleWordStatus::NO_FOUND_WORD;
+        }
+        Word wordInfo = *relevantWord;
+
+        std::cout << "d relw_\n" << wordInfo.kanji << "\n";
+        for (auto& r : wordInfo.readings)
+        {
+            std::cout << r << " ";
+        }
+        std::cout << '\n';
+        for (auto& pos : wordInfo.partsOfSpeach)
+        {
+            std::cout << pos << " ";
+        }
+        std::cout << '\n';
+
+        if (!wordInfo.partsOfSpeach.contains("Noun"))
+        {
+            return HandleWordStatus::NO_SPEACH_PART;
+        }
+
+        auto reading = conv_utf8_to_utf32(*wordInfo.readings.begin());
+        std::optional<char32_t> lastKanaOpt = getLastKana(reading);
+        std::optional<char32_t> firstKana = getFirstKana(reading);
+        if (!lastKanaOpt)
+        {
+            return HandleWordStatus::GOT_ERROR;
+        }
+        if (!firstKana || ctx_.lastKana != toHiragana(*firstKana))
+        {
+            return HandleWordStatus::CANT_JOIN_WORDS;
+        }
+
+        char32_t lastKana = toHiragana(*lastKanaOpt);
+
+        if (lastKana == U'ん')
+        {
+            stop_ = true;
+            return HandleWordStatus::GOT_END_WORD;
+        }
+
+        // Now all filters were passed and words is good
+
+        ctx_.lastPlayerId = id;
+        ctx_.lastKana = lastKana;
+
+        ps.score++;
+
+        ctx_.wordsCount++;
+
+        players_.erase(it);
+        players_.insert(ps);
+
+        words_.emplace_back(wordInfo);
+
+        return HandleWordStatus::OK;
+    }
 }
