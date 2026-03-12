@@ -32,7 +32,7 @@ class GameSession : public IGameSession
     HandleWordStatus handleWord(ull, const std::string&) override;
     void stopGame() override;
 
-    GameContext GetInfo() override;
+    GameContext getInfo() override;
 
   private:
     void saveStats();

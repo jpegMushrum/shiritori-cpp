@@ -18,7 +18,7 @@ void GamesController::startNewGame(ull adminId, std::function<void(GameContext)>
                 ull id = nextGameId_++;
 
                 activeGames_[id] = gameFabric_->createGame(id, adminId);
-                info = activeGames_[id]->GetInfo();
+                info = activeGames_[id]->getInfo();
             }
 
             f(info);
@@ -38,9 +38,7 @@ void GamesController::stopGame(ull gameId, ull userId)
                 return;
             }
 
-            std::cout << "d trying to stop game | " << it->second->GetInfo().adminId << " "
-                      << userId << '\n';
-            if (it->second->GetInfo().adminId == userId)
+            if (it->second->getInfo().adminId == userId)
             {
                 it->second->stopGame();
                 activeGames_.erase(it);
@@ -87,7 +85,7 @@ void GamesController::getActiveGames(std::function<void(std::vector<GameContext>
                 auto it = activeGames_.begin();
                 while (it != activeGames_.end())
                 {
-                    result.push_back(it->second->GetInfo());
+                    result.push_back(it->second->getInfo());
                     it++;
                 }
             }
@@ -111,7 +109,7 @@ void GamesController::getGameInfo(ull gameId, std::function<void(GameContext)> f
                     return;
                 }
 
-                info = it->second->GetInfo();
+                info = it->second->getInfo();
             }
 
             f(info);

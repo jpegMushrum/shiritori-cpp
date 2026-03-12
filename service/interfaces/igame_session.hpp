@@ -19,5 +19,5 @@ class IGameSession
     virtual HandleWordStatus handleWord(ull, const std::string&) = 0;
     virtual void stopGame() = 0;
 
-    virtual GameContext GetInfo() = 0;
+    virtual GameContext getInfo() = 0;
 };

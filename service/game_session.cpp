@@ -69,7 +69,7 @@ void GameSession::addUser(ull id)
     ctx_.playersCount++;
 }
 
-GameContext GameSession::GetInfo()
+GameContext GameSession::getInfo()
 {
     std::lock_guard lock(mu_);
     return ctx_;

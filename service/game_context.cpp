@@ -12,7 +12,6 @@ GameContext::GameContext(ull id, int wordsCount, int playersCount, ull adminId, 
 
 std::ostream& operator<<(std::ostream& out, const GameContext& gc)
 {
-    std::cout << "d<<| " << (int)gc.lastKana << '\n';
     std::u32string u32kana(1, gc.lastKana);
     std::string lastKana = boost::locale::conv::utf_to_utf<char>(u32kana);
 
