@@ -5,6 +5,7 @@ using ull = unsigned long long;
 class GameInfo
 {
   public:
+    GameInfo();
     GameInfo(ull, ull, int, int);
 
     ull gameId;

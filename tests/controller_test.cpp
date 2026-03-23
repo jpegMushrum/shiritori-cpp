@@ -3,6 +3,7 @@
 
 #include <future>
 
+#include "game_info.hpp"
 #include "iinfo_service.hpp"
 #include "info_controller.hpp"
 #include "task_queue.hpp"
@@ -24,6 +25,7 @@ class MockInfoService : public IInfoService
   public:
     MOCK_METHOD(UserInfo, getUserInfo, (ull), (override));
     MOCK_METHOD(ull, addUser, (const std::string&), (override));
+    MOCK_METHOD(std::vector<GameInfo>, getGamesHistory, (ull), (override));
 };
 
 class InfoControllerTest : public ::testing::Test
@@ -254,4 +256,72 @@ TEST_F(GamesControllerTest, GetGameInfoReturnsCorrectContext)
     EXPECT_EQ(result.wordsCount, 1);
     EXPECT_EQ(result.playersCount, 1);
     EXPECT_EQ(result.lastKana, U'あ');
+}
+
+TEST_F(InfoControllerTest, GetGamesHistoryCallsServiceAndReturnsResult)
+{
+    std::vector<GameInfo> expectedHistory{GameInfo(1, 42, 10, 1), GameInfo(2, 42, 15, 2)};
+
+    EXPECT_CALL(*infoService, getGamesHistory(42)).Times(1).WillOnce(Return(expectedHistory));
+
+    std::promise<std::vector<GameInfo>> promise;
+    auto future = promise.get_future();
+
+    controller->getGamesHistory(42,
+                                [&](std::vector<GameInfo> history) { promise.set_value(history); });
+
+    auto result = future.get();
+
+    EXPECT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0].gameId, 1);
+    EXPECT_EQ(result[0].words, 10);
+    EXPECT_EQ(result[0].place, 1);
+    EXPECT_EQ(result[1].gameId, 2);
+    EXPECT_EQ(result[1].words, 15);
+    EXPECT_EQ(result[1].place, 2);
+}
+
+TEST_F(InfoControllerTest, GetGamesHistoryEmptyHistory)
+{
+    std::vector<GameInfo> emptyHistory;
+
+    EXPECT_CALL(*infoService, getGamesHistory(999)).Times(1).WillOnce(Return(emptyHistory));
+
+    std::promise<std::vector<GameInfo>> promise;
+    auto future = promise.get_future();
+
+    controller->getGamesHistory(999,
+                                [&](std::vector<GameInfo> history) { promise.set_value(history); });
+
+    auto result = future.get();
+
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST_F(InfoControllerTest, GetGamesHistoryMultiplePlayersIndependent)
+{
+    std::vector<GameInfo> history1{GameInfo(1, 10, 20, 1), GameInfo(2, 10, 30, 2)};
+    std::vector<GameInfo> history2{GameInfo(3, 20, 25, 1)};
+
+    EXPECT_CALL(*infoService, getGamesHistory(10)).Times(1).WillOnce(Return(history1));
+    EXPECT_CALL(*infoService, getGamesHistory(20)).Times(1).WillOnce(Return(history2));
+
+    std::promise<std::vector<GameInfo>> promise1;
+    auto future1 = promise1.get_future();
+
+    std::promise<std::vector<GameInfo>> promise2;
+    auto future2 = promise2.get_future();
+
+    controller->getGamesHistory(10, [&](std::vector<GameInfo> history)
+                                { promise1.set_value(history); });
+    controller->getGamesHistory(20, [&](std::vector<GameInfo> history)
+                                { promise2.set_value(history); });
+
+    auto result1 = future1.get();
+    auto result2 = future2.get();
+
+    EXPECT_EQ(result1.size(), 2);
+    EXPECT_EQ(result1[0].gameId, 1);
+    EXPECT_EQ(result2.size(), 1);
+    EXPECT_EQ(result2[0].gameId, 3);
 }

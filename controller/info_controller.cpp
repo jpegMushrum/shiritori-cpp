@@ -32,3 +32,13 @@ void InfoController::addUser(const std::string& nickname, std::function<void(ull
             }
         });
 }
+
+void InfoController::getGamesHistory(ull id, std::function<void(std::vector<GameInfo>)> f)
+{
+    taskQueue_->addTask(
+        [this, id, f]()
+        {
+            auto history = infoService_->getGamesHistory(id);
+            f(history);
+        });
+}

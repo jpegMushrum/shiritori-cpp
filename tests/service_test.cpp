@@ -410,3 +410,117 @@ TEST_F(InfoServiceTest, GetUserInfoAfterAddUser)
     EXPECT_EQ(userInfo.id, 888);
     EXPECT_EQ(userInfo.nickname, "TestUser");
 }
+
+TEST_F(InfoServiceTest, GetUserInfoCalculatesGamesAndWordsCorrectly)
+{
+    User user(42, "Player");
+    std::vector<Game> gameHistory{Game(1, 42, 10, 1), Game(2, 42, 15, 2), Game(3, 42, 5, 3)};
+
+    EXPECT_CALL(*usersRepo, getUser(42)).WillOnce(Return(user));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(42)).WillOnce(Return(gameHistory));
+
+    auto userInfo = service->getUserInfo(42);
+
+    EXPECT_EQ(userInfo.id, 42);
+    EXPECT_EQ(userInfo.nickname, "Player");
+    EXPECT_EQ(userInfo.games, 3);
+    EXPECT_EQ(userInfo.words, 30);
+}
+
+TEST_F(InfoServiceTest, GetUserInfoWithEmptyGameHistory)
+{
+    User user(100, "NewPlayer");
+    std::vector<Game> emptyHistory;
+
+    EXPECT_CALL(*usersRepo, getUser(100)).WillOnce(Return(user));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(100)).WillOnce(Return(emptyHistory));
+
+    auto userInfo = service->getUserInfo(100);
+
+    EXPECT_EQ(userInfo.id, 100);
+    EXPECT_EQ(userInfo.nickname, "NewPlayer");
+    EXPECT_EQ(userInfo.games, 0);
+    EXPECT_EQ(userInfo.words, 0);
+}
+
+TEST_F(InfoServiceTest, GetUserInfoWithSingleGame)
+{
+    User user(50, "Player50");
+    std::vector<Game> gameHistory{Game(999, 50, 42, 1)};
+
+    EXPECT_CALL(*usersRepo, getUser(50)).WillOnce(Return(user));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(50)).WillOnce(Return(gameHistory));
+
+    auto userInfo = service->getUserInfo(50);
+
+    EXPECT_EQ(userInfo.id, 50);
+    EXPECT_EQ(userInfo.games, 1);
+    EXPECT_EQ(userInfo.words, 42);
+}
+
+TEST_F(InfoServiceTest, GetUserInfoMultipleUsersIndependent)
+{
+    User user1(1, "Alice");
+    User user2(2, "Bob");
+
+    std::vector<Game> history1{Game(1, 1, 20, 1), Game(2, 1, 30, 1)};
+
+    std::vector<Game> history2{Game(3, 2, 15, 1)};
+
+    EXPECT_CALL(*usersRepo, getUser(1)).WillOnce(Return(user1));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(1)).WillOnce(Return(history1));
+    EXPECT_CALL(*usersRepo, getUser(2)).WillOnce(Return(user2));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(2)).WillOnce(Return(history2));
+
+    auto info1 = service->getUserInfo(1);
+    auto info2 = service->getUserInfo(2);
+
+    EXPECT_EQ(info1.games, 2);
+    EXPECT_EQ(info1.words, 50);
+    EXPECT_EQ(info2.games, 1);
+    EXPECT_EQ(info2.words, 15);
+}
+
+TEST_F(InfoServiceTest, GetGamesHistoryReturnsCorrectData)
+{
+    std::vector<Game> gameHistory{Game(1, 42, 10, 1), Game(2, 42, 15, 2), Game(3, 42, 5, 3)};
+
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(42)).WillOnce(Return(gameHistory));
+
+    auto result = service->getGamesHistory(42);
+
+    EXPECT_EQ(result.size(), 3);
+    EXPECT_EQ(result[0].gameId, 1);
+    EXPECT_EQ(result[0].words, 10);
+    EXPECT_EQ(result[0].place, 1);
+    EXPECT_EQ(result[1].gameId, 2);
+    EXPECT_EQ(result[1].words, 15);
+    EXPECT_EQ(result[1].place, 2);
+    EXPECT_EQ(result[2].gameId, 3);
+    EXPECT_EQ(result[2].words, 5);
+    EXPECT_EQ(result[2].place, 3);
+}
+
+TEST_F(InfoServiceTest, GetGamesHistoryEmptyWhenNoGames)
+{
+    std::vector<Game> emptyHistory;
+
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(999)).WillOnce(Return(emptyHistory));
+
+    auto result = service->getGamesHistory(999);
+
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST_F(InfoServiceTest, GetGamesHistoryPreservesGameOrder)
+{
+    std::vector<Game> gameHistory{Game(100, 10, 50, 1), Game(101, 10, 25, 2), Game(102, 10, 75, 3)};
+
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(10)).WillOnce(Return(gameHistory));
+
+    auto result = service->getGamesHistory(10);
+
+    EXPECT_EQ(result[0].gameId, 100);
+    EXPECT_EQ(result[1].gameId, 101);
+    EXPECT_EQ(result[2].gameId, 102);
+}

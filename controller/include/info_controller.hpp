@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 
+#include "game_info.hpp"
 #include "iinfo_service.hpp"
 #include "task_queue.hpp"
 #include "user_info.hpp"
@@ -16,6 +17,8 @@ class InfoController
 
     void getUserInfo(ull, std::function<void(UserInfo)>);
     void addUser(const std::string&, std::function<void(ull)>);
+
+    void getGamesHistory(ull, std::function<void(std::vector<GameInfo>)>);
 
   private:
     std::shared_ptr<TaskQueue> taskQueue_;
