@@ -2,9 +2,6 @@
 
 using ull = unsigned long long;
 
-User::User() : id(0), nickname(""), games(0), words(0) {}
+User::User() : id(0), nickname("") {}
 
-User::User(ull id, std::string nickname, int games, int words)
-    : id(id), nickname(nickname), games(games), words(words)
-{
-}
+User::User(ull id, std::string nickname) : id(id), nickname(nickname) {}

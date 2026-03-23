@@ -24,7 +24,7 @@ UserInfo InfoService::getUserInfo(ull id)
 ull InfoService::addUser(const std::string& nickname)
 {
 
-    User newUser(0, nickname, 0, 0);
+    User newUser(0, nickname);
     ull id = usersRepo_->addUser(newUser);
 
     return id;

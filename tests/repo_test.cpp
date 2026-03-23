@@ -62,7 +62,7 @@ class UsersRepoTest : public ::testing::Test
 
 TEST_F(UsersRepoTest, AddUserReturnsValidId)
 {
-    User user(0, "TestUser", 0, 0);
+    User user(0, "TestUser");
 
     ull userId = repo->addUser(user);
 
@@ -71,9 +71,9 @@ TEST_F(UsersRepoTest, AddUserReturnsValidId)
 
 TEST_F(UsersRepoTest, AddUserMultipleUsers)
 {
-    User user1(0, "User1", 0, 0);
-    User user2(0, "User2", 0, 0);
-    User user3(0, "User3", 0, 0);
+    User user1(0, "User1");
+    User user2(0, "User2");
+    User user3(0, "User3");
 
     ull id1 = repo->addUser(user1);
     ull id2 = repo->addUser(user2);
@@ -86,15 +86,13 @@ TEST_F(UsersRepoTest, AddUserMultipleUsers)
 
 TEST_F(UsersRepoTest, GetUserReturnsCorrectData)
 {
-    User originalUser(0, "Alice", 0, 0);
+    User originalUser(0, "Alice");
     ull userId = repo->addUser(originalUser);
 
     User retrievedUser = repo->getUser(userId);
 
     EXPECT_EQ(retrievedUser.id, userId);
     EXPECT_EQ(retrievedUser.nickname, "Alice");
-    EXPECT_EQ(retrievedUser.games, 0);
-    EXPECT_EQ(retrievedUser.words, 0);
 }
 
 TEST_F(UsersRepoTest, GetUserWithNonExistentId)
@@ -112,7 +110,7 @@ TEST_F(UsersRepoTest, AddUserWithDifferentNicknames)
 
     for (const auto& nickname : nicknames)
     {
-        User user(0, nickname, 0, 0);
+        User user(0, nickname);
         userIds.push_back(repo->addUser(user));
     }
 
@@ -125,7 +123,7 @@ TEST_F(UsersRepoTest, AddUserWithDifferentNicknames)
 
 TEST_F(UsersRepoTest, AddUserWithEmptyNickname)
 {
-    User user(0, "", 0, 0);
+    User user(0, "");
 
     ull userId = repo->addUser(user);
 
@@ -136,7 +134,7 @@ TEST_F(UsersRepoTest, AddUserWithEmptyNickname)
 TEST_F(UsersRepoTest, AddUserWithLongNickname)
 {
     std::string longNickname(255, 'a');
-    User user(0, longNickname, 0, 0);
+    User user(0, longNickname);
 
     ull userId = repo->addUser(user);
     User retrieved = repo->getUser(userId);
@@ -146,7 +144,7 @@ TEST_F(UsersRepoTest, AddUserWithLongNickname)
 
 TEST_F(UsersRepoTest, AddUserWithSpecialCharacters)
 {
-    User user(0, "User@#$%^&*()", 0, 0);
+    User user(0, "User@#$%^&*()");
 
     ull userId = repo->addUser(user);
     User retrieved = repo->getUser(userId);
@@ -156,7 +154,7 @@ TEST_F(UsersRepoTest, AddUserWithSpecialCharacters)
 
 TEST_F(UsersRepoTest, AddUserWithUTF8Nickname)
 {
-    User user(0, "ユーザー", 0, 0);
+    User user(0, "ユーザー");
 
     ull userId = repo->addUser(user);
     User retrieved = repo->getUser(userId);
@@ -166,10 +164,10 @@ TEST_F(UsersRepoTest, AddUserWithUTF8Nickname)
 
 TEST_F(UsersRepoTest, ChangeUserUpdatesNickname)
 {
-    User originalUser(0, "Original", 0, 0);
+    User originalUser(0, "Original");
     ull userId = repo->addUser(originalUser);
 
-    User modifiedUser(userId, "Modified", 0, 0);
+    User modifiedUser(userId, "Modified");
     repo->changeUser(modifiedUser);
 
     User retrieved = repo->getUser(userId);
@@ -178,63 +176,56 @@ TEST_F(UsersRepoTest, ChangeUserUpdatesNickname)
 
 TEST_F(UsersRepoTest, ChangeUserUpdatesGamesAndWords)
 {
-    User originalUser(0, "TestUser", 0, 0);
+    User originalUser(0, "TestUser");
     ull userId = repo->addUser(originalUser);
 
-    User modifiedUser(userId, "TestUser", 10, 50);
+    User modifiedUser(userId, "TestUser");
     repo->changeUser(modifiedUser);
 
     User retrieved = repo->getUser(userId);
-    EXPECT_EQ(retrieved.games, 10);
-    EXPECT_EQ(retrieved.words, 50);
+    EXPECT_EQ(retrieved.nickname, "TestUser");
 }
 
 TEST_F(UsersRepoTest, ChangeUserUpdatesAllFields)
 {
-    User originalUser(0, "Alice", 0, 0);
+    User originalUser(0, "Alice");
     ull userId = repo->addUser(originalUser);
 
-    User modifiedUser(userId, "Bob", 25, 100);
+    User modifiedUser(userId, "Bob");
     repo->changeUser(modifiedUser);
 
     User retrieved = repo->getUser(userId);
     EXPECT_EQ(retrieved.nickname, "Bob");
-    EXPECT_EQ(retrieved.games, 25);
-    EXPECT_EQ(retrieved.words, 100);
 }
 
 TEST_F(UsersRepoTest, ChangeUserMultipleTimes)
 {
-    User user(0, "Original", 0, 0);
+    User user(0, "Original");
     ull userId = repo->addUser(user);
 
-    User update1(userId, "Update1", 5, 10);
+    User update1(userId, "Update1");
     repo->changeUser(update1);
 
     User retrieved1 = repo->getUser(userId);
-    EXPECT_EQ(retrieved1.games, 5);
-    EXPECT_EQ(retrieved1.words, 10);
+    EXPECT_EQ(retrieved1.nickname, "Update1");
 
-    User update2(userId, "Update2", 15, 30);
+    User update2(userId, "Update2");
     repo->changeUser(update2);
 
     User retrieved2 = repo->getUser(userId);
-    EXPECT_EQ(retrieved2.games, 15);
-    EXPECT_EQ(retrieved2.words, 30);
     EXPECT_EQ(retrieved2.nickname, "Update2");
 }
 
 TEST_F(UsersRepoTest, ChangeUserWithLargeNumbers)
 {
-    User originalUser(0, "TestUser", 0, 0);
+    User originalUser(0, "TestUser");
     ull userId = repo->addUser(originalUser);
 
-    User modifiedUser(userId, "TestUser", 1000000, 5000000);
+    User modifiedUser(userId, "TestUser");
     repo->changeUser(modifiedUser);
 
     User retrieved = repo->getUser(userId);
-    EXPECT_EQ(retrieved.games, 1000000);
-    EXPECT_EQ(retrieved.words, 5000000);
+    EXPECT_EQ(retrieved.nickname, "TestUser");
 }
 
 class GamesRepoTest : public ::testing::Test

@@ -326,7 +326,7 @@ class InfoServiceTest : public ::testing::Test
 
 TEST_F(InfoServiceTest, GetUserInfoReturnsUserData)
 {
-    User expectedUser(42, "Alice", 100, 50);
+    User expectedUser(42, "Alice");
 
     EXPECT_CALL(*usersRepo, getUser(42)).WillOnce(Return(expectedUser));
 
@@ -334,14 +334,12 @@ TEST_F(InfoServiceTest, GetUserInfoReturnsUserData)
 
     EXPECT_EQ(userInfo.id, 42);
     EXPECT_EQ(userInfo.nickname, "Alice");
-    EXPECT_EQ(userInfo.games, 100);
-    EXPECT_EQ(userInfo.words, 50);
 }
 
 TEST_F(InfoServiceTest, GetUserInfoMultipleCalls)
 {
-    User user1(1, "Bob", 200, 75);
-    User user2(2, "Charlie", 150, 60);
+    User user1(1, "Bob");
+    User user2(2, "Charlie");
 
     EXPECT_CALL(*usersRepo, getUser(1)).WillOnce(Return(user1));
     EXPECT_CALL(*usersRepo, getUser(2)).WillOnce(Return(user2));
@@ -351,8 +349,6 @@ TEST_F(InfoServiceTest, GetUserInfoMultipleCalls)
 
     EXPECT_EQ(info1.nickname, "Bob");
     EXPECT_EQ(info2.nickname, "Charlie");
-    EXPECT_EQ(info1.games, 200);
-    EXPECT_EQ(info2.games, 150);
 }
 
 TEST_F(InfoServiceTest, AddUserCreatesNewUser)
@@ -403,10 +399,10 @@ TEST_F(InfoServiceTest, AddUserWithLongNickname)
 
 TEST_F(InfoServiceTest, GetUserInfoAfterAddUser)
 {
-    User newUser(0, "TestUser", 0, 0);
+    User newUser(0, "TestUser");
 
     EXPECT_CALL(*usersRepo, addUser(_)).WillOnce(Return(888));
-    EXPECT_CALL(*usersRepo, getUser(888)).WillOnce(Return(User(888, "TestUser", 0, 0)));
+    EXPECT_CALL(*usersRepo, getUser(888)).WillOnce(Return(User(888, "TestUser")));
 
     ull userId = service->addUser("TestUser");
     auto userInfo = service->getUserInfo(userId);

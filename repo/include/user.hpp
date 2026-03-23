@@ -8,10 +8,8 @@ class User
 {
   public:
     User();
-    User(ull, std::string, int, int);
+    User(ull, std::string);
 
     ull id;
     std::string nickname;
-    int games;
-    int words;
 };
