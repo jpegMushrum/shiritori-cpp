@@ -13,8 +13,6 @@ using tcp = boost::asio::ip::tcp;
 class Session : public std::enable_shared_from_this<Session>
 {
   public:
-    Session(const Session&) = delete;
-    Session& operator=(const Session&) = delete;
     Session(tcp::socket&&, std::shared_ptr<IInfoController>, std::shared_ptr<IGamesController>);
 
     void start();
@@ -26,6 +24,6 @@ class Session : public std::enable_shared_from_this<Session>
     std::shared_ptr<IInfoController> infoCtr_;
     std::shared_ptr<IGamesController> gamesCtr_;
 
-    void doWrite(const std::string&);
+    void doWrite(std::string);
     void doRead();
 };
