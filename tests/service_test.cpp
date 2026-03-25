@@ -329,6 +329,7 @@ TEST_F(InfoServiceTest, GetUserInfoReturnsUserData)
     User expectedUser(42, "Alice");
 
     EXPECT_CALL(*usersRepo, getUser(42)).WillOnce(Return(expectedUser));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(42)).WillOnce(Return(std::vector<Game>()));
 
     auto userInfo = service->getUserInfo(42);
 
@@ -343,6 +344,8 @@ TEST_F(InfoServiceTest, GetUserInfoMultipleCalls)
 
     EXPECT_CALL(*usersRepo, getUser(1)).WillOnce(Return(user1));
     EXPECT_CALL(*usersRepo, getUser(2)).WillOnce(Return(user2));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(1)).WillOnce(Return(std::vector<Game>()));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(2)).WillOnce(Return(std::vector<Game>()));
 
     auto info1 = service->getUserInfo(1);
     auto info2 = service->getUserInfo(2);
@@ -399,16 +402,17 @@ TEST_F(InfoServiceTest, AddUserWithLongNickname)
 
 TEST_F(InfoServiceTest, GetUserInfoAfterAddUser)
 {
-    User newUser(0, "TestUser");
+    User newUser(1, "TestUser");
 
-    EXPECT_CALL(*usersRepo, addUser(_)).WillOnce(Return(888));
-    EXPECT_CALL(*usersRepo, getUser(888)).WillOnce(Return(User(888, "TestUser")));
+    EXPECT_CALL(*usersRepo, addUser(_)).WillOnce(Return(1));
+    EXPECT_CALL(*usersRepo, getUser(1)).WillOnce(Return(newUser));
+    EXPECT_CALL(*gamesRepo, getGameHistoryByUserId(1)).WillOnce(Return(std::vector<Game>()));
 
     ull userId = service->addUser("TestUser");
     auto userInfo = service->getUserInfo(userId);
 
-    EXPECT_EQ(userInfo.id, 888);
-    EXPECT_EQ(userInfo.nickname, "TestUser");
+    EXPECT_EQ(userInfo.id, newUser.id);
+    EXPECT_EQ(userInfo.nickname, newUser.nickname);
 }
 
 TEST_F(InfoServiceTest, GetUserInfoCalculatesGamesAndWordsCorrectly)

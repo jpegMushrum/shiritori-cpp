@@ -5,6 +5,7 @@ add_executable(tests
     controller_test.cpp
     service_test.cpp
     repo_test.cpp
+    network_test.cpp
 )
 
 find_package(GTest CONFIG REQUIRED)
@@ -16,6 +17,7 @@ target_link_libraries(tests
     service
     repo
     controller
+    network
 )
 
 add_test(NAME all_tests COMMAND tests)
