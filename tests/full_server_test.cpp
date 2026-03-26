@@ -495,11 +495,14 @@ TEST_F(FullServerTest, AddPlayerToGame)
     sendAndReceive(client, "addUser Creator");
     sendAndReceive(client, "addUser Player");
 
-    std::string gameResponse = sendAndReceive(client, "startNewGame 1");
+    std::string gameResponse = sendAndReceive(client, "startNewGame 2");
     EXPECT_FALSE(isErrorResponse(gameResponse));
 
-    std::string addPlayerResponse = sendAndReceive(client, "addPlayerToGame 2 1");
+    std::string addPlayerResponse = sendAndReceive(client, "addPlayerToGame 2 0");
     EXPECT_FALSE(isErrorResponse(addPlayerResponse));
+
+    std::string getGameInfoResponse = sendAndReceive(client, "getGameInfo 0");
+    EXPECT_TRUE(responseContains(getGameInfoResponse, "1 2"));
 
     client.disconnect();
 }
@@ -545,14 +548,16 @@ TEST_F(FullServerTest, GameStatisticsAfterStop)
     std::string gameResponse = sendAndReceive(client, "startNewGame 1");
     EXPECT_FALSE(isErrorResponse(gameResponse));
 
-    sendAndReceive(client, "addPlayerToGame 2 1");
-    sendAndReceive(client, "stopGame 1 1");
+    sendAndReceive(client, "addPlayerToGame 2 0");
+    sendAndReceive(client, "stopGame 0 1");
 
     std::string history1 = sendAndReceive(client, "getGamesHistory 1");
     std::string history2 = sendAndReceive(client, "getGamesHistory 2");
 
     EXPECT_FALSE(isErrorResponse(history1));
+    EXPECT_TRUE(history1.empty());
     EXPECT_FALSE(isErrorResponse(history2));
+    EXPECT_FALSE(history2.empty());
 
     client.disconnect();
 }
