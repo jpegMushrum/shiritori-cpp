@@ -1,5 +1,5 @@
 {
-  "name": "shiritori-cpp",
+  "name": "shiritori-server",
   "version": "0.1.0",
   "dependencies": [
     "boost",

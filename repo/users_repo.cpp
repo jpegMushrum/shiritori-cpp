@@ -16,7 +16,7 @@ void UsersRepo::initTables()
     const std::string sql = R"(
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nickname TEXT NOT NULL
+                nickname TEXT UNIQUE NOT NULL
             );
         )";
 
