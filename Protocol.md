@@ -4,10 +4,10 @@
 
 The Shiritori server communicates over TCP sockets using text-based commands and responses. All commands are space-separated strings terminated by a newline character.
 
-## Authentication
-
 > [!IMPORTANT]
 > All requests must start with integer request id, and this id will be bounced back as 1-st argument in all responses. It doesn't apply anything to requests, it's needed for response selecting.
+
+## Authentication
 
 ### login
 **Usage:** `login <username>`
