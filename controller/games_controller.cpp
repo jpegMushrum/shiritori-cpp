@@ -128,7 +128,8 @@ void GamesController::getGameInfo(ull gameId, std::function<void(GameContext)> f
         });
 }
 
-void GamesController::addPlayerToGame(ull userId, ull gameId, std::function<void(WordInfo)> update)
+void GamesController::addPlayerToGame(ull userId, ull gameId,
+                                      std::function<void(WordInfo, char32_t)> update)
 {
     taskQueue_->addTask(
         [this, userId, gameId, update]()
@@ -140,9 +141,7 @@ void GamesController::addPlayerToGame(ull userId, ull gameId, std::function<void
                 return;
             }
 
-            if (game->second->addUser(userId))
-            {
-                game->second->subscribe(update);
-            }
+            game->second->addUser(userId);
+            game->second->subscribe(userId, update);
         });
 }

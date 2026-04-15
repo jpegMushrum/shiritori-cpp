@@ -7,6 +7,7 @@
 #include <mutex>
 #include <random>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -35,7 +36,7 @@ class GameSession : public IGameSession
     void stopGame() override;
 
     GameContext getInfo() override;
-    void subscribe(std::function<void(WordInfo)>) override;
+    void subscribe(ull, std::function<void(WordInfo, char32_t)>) override;
 
   private:
     void saveStats();
@@ -50,6 +51,6 @@ class GameSession : public IGameSession
     std::mutex mu_;
     GameContext ctx_;
 
-    std::vector<std::function<void(WordInfo)>> subscriptions_;
-    void throwUpdate(WordInfo);
+    std::unordered_map<ull, std::function<void(WordInfo, char32_t)>> subscriptions_;
+    void throwUpdate(WordInfo, char32_t);
 };

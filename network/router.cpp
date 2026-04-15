@@ -3,6 +3,8 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 
+#include <boost/locale.hpp>
+
 #include "router.hpp"
 
 using json = nlohmann::json;
@@ -22,6 +24,7 @@ void Router::parseAndAnswer(std::string querry)
         writeCb_("Error: empty querry");
         return;
     }
+    std::cout << "d| " << querry << '\n';
 
     std::stringstream ss(querry);
     std::string command;
@@ -306,13 +309,16 @@ void Router::parseAndAnswer(std::string querry)
 
             ull userId = sessionManager_->getUserIdFromSession(sessionId);
 
-            gamesCtr_->addPlayerToGame(userId, gameId,
-                                       [writeRId, gameId](WordInfo wi)
-                                       {
-                                           std::string msg = std::format("NewWord {} {}", gameId,
-                                                                         Router::wiToString(wi));
-                                           writeRId(msg);
-                                       });
+            gamesCtr_->addPlayerToGame(
+                userId, gameId,
+                [writeRId, gameId](WordInfo wi, char32_t lastKana)
+                {
+                    std::string lastKanaStr =
+                        boost::locale::conv::utf_to_utf<char>(std::u32string(1, lastKana));
+                    std::string msg = std::format("newWord {} {} {}", gameId, lastKanaStr,
+                                                  Router::wiToString(wi));
+                    writeRId(msg);
+                });
             writeRId("Player added successfully");
         }
         catch (...)

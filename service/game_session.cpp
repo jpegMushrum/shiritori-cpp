@@ -4,8 +4,7 @@ using ull = unsigned long long;
 
 GameSession::GameSession(ull id, ull adminId, std::shared_ptr<IDictionary> dict,
                          std::shared_ptr<IGamesRepo> repo, char32_t startKana)
-    : dict_(dict), repo_(repo), stop_(false),
-      subscriptions_(std::vector<std::function<void(WordInfo)>>(0))
+    : dict_(dict), repo_(repo), stop_(false)
 {
     ctx_ = GameContext(id, 0, 0, adminId, startKana);
 }
@@ -346,20 +345,20 @@ HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
 
         words_.emplace_back(wordInfo);
 
-        throwUpdate(Mapper::WordToDto(wordInfo));
+        throwUpdate(Mapper::WordToDto(wordInfo), lastKana);
         return HandleWordStatus::OK;
     }
 }
 
-void GameSession::subscribe(std::function<void(WordInfo)> update)
+void GameSession::subscribe(ull userId, std::function<void(WordInfo, char32_t)> update)
 {
-    subscriptions_.emplace_back(update);
+    subscriptions_[userId] = update;
 }
 
-void GameSession::throwUpdate(WordInfo wi)
+void GameSession::throwUpdate(WordInfo wi, char32_t lastKana)
 {
-    for (auto it = subscriptions_.begin(); it != subscriptions_.end(); it++)
+    for (auto& pair : subscriptions_)
     {
-        (*it)(wi);
+        pair.second(wi, lastKana);
     }
 }

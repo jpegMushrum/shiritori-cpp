@@ -168,7 +168,7 @@ Example: 100 0 1 42 0 あ
 **Description:** Add the authenticated user to an existing game as a player. Provides a subscription, so after this query socket must become only reading.
 
 **Response (Success):** `Player added successfully`
-**Response (Update)** `NewWord <gameId> {"kanji":string,"meaning":string,"partsOfSpeach":[]string,"readings":[]string}`
+**Response (Update)** `newWord <gameId> <lastKana> {"kanji":string,"meaning":string,"partsOfSpeach":[]string,"readings":[]string}`
 
 **Errors:**
 - `Error: addPlayerToGame requires session ID and game ID` - Missing arguments
