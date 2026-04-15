@@ -311,6 +311,12 @@ void Router::parseAndAnswer(std::string querry)
 
             gamesCtr_->addPlayerToGame(
                 userId, gameId,
+                [writeRId, gameId](PlayerJoinInfo joinInfo)
+                {
+                    std::string msg = std::format("playerJoinedGame {} {}", gameId,
+                                                  Router::playerJoinInfoToString(joinInfo));
+                    writeRId(msg);
+                },
                 [writeRId, gameId](WordInfo wi, char32_t lastKana)
                 {
                     std::string lastKanaStr =
@@ -471,4 +477,23 @@ std::string Router::wiToString(const WordInfo& wi)
                    {"partsOfSpeach", wi.partsOfSpeach},
                    {"meaning", wi.meaning}};
     return wiJson.dump();
+}
+
+std::string Router::playerJoinInfoToString(const PlayerJoinInfo& info)
+{
+    json wordsJsonArray = json::array();
+    for (const auto& word : info.usedWords)
+    {
+        json wordJson = {{"kanji", word.kanji},
+                         {"readings", word.readings},
+                         {"partsOfSpeach", word.partsOfSpeach},
+                         {"meaning", word.meaning}};
+        wordsJsonArray.push_back(wordJson);
+    }
+
+    std::string lastKanaStr =
+        boost::locale::conv::utf_to_utf<char>(std::u32string(1, info.lastKana));
+
+    json joinJson = {{"lastKana", lastKanaStr}, {"usedWords", wordsJsonArray}};
+    return joinJson.dump();
 }

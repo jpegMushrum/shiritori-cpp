@@ -165,10 +165,13 @@ Example: 100 0 1 42 0 あ
 ### addPlayerToGame
 **Usage:** `addPlayerToGame <sessionId> <gameId>`
 
-**Description:** Add the authenticated user to an existing game as a player. Provides a subscription, so after this query socket must become only reading.
+**Description:** Add the authenticated user to an existing game as a player. Returns the current game state (last kana and used words) and subscribes to word updates. After this query, the socket must become read-only.
 
 **Response (Success):** `Player added successfully`
-**Response (Update)** `newWord <gameId> <lastKana> {"kanji":string,"meaning":string,"partsOfSpeach":[]string,"readings":[]string}`
+
+**Response (Game Join Info)** `playerJoinedGame <gameId> {"lastKana":string,"usedWords":[{"kanji":string,"meaning":string,"partsOfSpeach":[]string,"readings":[]string}]}`
+
+**Response (Updates)** `newWord <gameId> <lastKana> {"kanji":string,"meaning":string,"partsOfSpeach":[]string,"readings":[]string}`
 
 **Errors:**
 - `Error: addPlayerToGame requires session ID and game ID` - Missing arguments

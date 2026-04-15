@@ -37,7 +37,9 @@ class MockGamesController : public IGamesController
     MOCK_METHOD(void, handleWord, (ull, ull, std::string, std::function<void(HandleWordStatus)>),
                 (override));
     MOCK_METHOD(void, getActiveGames, (std::function<void(std::vector<GameContext>)>), (override));
-    MOCK_METHOD(void, addPlayerToGame, (ull, ull, std::function<void(WordInfo, char32_t)>),
+    MOCK_METHOD(void, addPlayerToGame,
+                (ull, ull, std::function<void(PlayerJoinInfo)>,
+                 std::function<void(WordInfo, char32_t)>),
                 (override));
     MOCK_METHOD(void, stopGame, (ull, ull), (override));
     MOCK_METHOD(void, getGameInfo, (ull, std::function<void(GameContext)>), (override));
@@ -357,7 +359,7 @@ TEST_F(RouterTest, AddPlayerToGameSuccessfully)
     ull gameId = 3;
     std::string sessionId = getValidSessionId();
 
-    EXPECT_CALL(*mockGamesController, addPlayerToGame(userId, gameId, _)).Times(1);
+    EXPECT_CALL(*mockGamesController, addPlayerToGame(userId, gameId, _, _)).Times(1);
 
     responseMessages.clear();
     int rid = getNextRequestId();
@@ -369,7 +371,7 @@ TEST_F(RouterTest, AddPlayerToGameSuccessfully)
 
 TEST_F(RouterTest, AddPlayerToGameWithMissingSessionId)
 {
-    EXPECT_CALL(*mockGamesController, addPlayerToGame(_, _, _)).Times(0);
+    EXPECT_CALL(*mockGamesController, addPlayerToGame(_, _, _, _)).Times(0);
 
     int rid = getNextRequestId();
     router->parseAndAnswer(std::to_string(rid) + " addPlayerToGame");
@@ -382,7 +384,7 @@ TEST_F(RouterTest, AddPlayerToGameWithMissingSessionId)
 TEST_F(RouterTest, AddPlayerToGameWithMissingGameId)
 {
     std::string sessionId = getValidSessionId();
-    EXPECT_CALL(*mockGamesController, addPlayerToGame(_, _, _)).Times(0);
+    EXPECT_CALL(*mockGamesController, addPlayerToGame(_, _, _, _)).Times(0);
 
     responseMessages.clear();
     int rid = getNextRequestId();
@@ -395,7 +397,7 @@ TEST_F(RouterTest, AddPlayerToGameWithMissingGameId)
 
 TEST_F(RouterTest, AddPlayerToGameWithInvalidSessionId)
 {
-    EXPECT_CALL(*mockGamesController, addPlayerToGame(_, _, _)).Times(0);
+    EXPECT_CALL(*mockGamesController, addPlayerToGame(_, _, _, _)).Times(0);
 
     int rid = getNextRequestId();
     router->parseAndAnswer(std::to_string(rid) + " addPlayerToGame invalid 3");

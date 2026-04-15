@@ -362,3 +362,9 @@ void GameSession::throwUpdate(WordInfo wi, char32_t lastKana)
         pair.second(wi, lastKana);
     }
 }
+
+PlayerJoinInfo GameSession::getPlayerJoinInfo()
+{
+    std::lock_guard lock(mu_);
+    return {ctx_.lastKana, words_};
+}

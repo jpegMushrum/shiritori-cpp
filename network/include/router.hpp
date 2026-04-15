@@ -7,6 +7,7 @@
 #include "game_context.hpp"
 #include "game_info.hpp"
 #include "handle_word_status.hpp"
+#include "igame_session.hpp"
 #include "igames_controller.hpp"
 #include "iinfo_controller.hpp"
 #include "session_manager.hpp"
@@ -32,4 +33,5 @@ class Router
     static std::string giToString(const GameInfo&);
     static std::string statusToString(HandleWordStatus);
     static std::string wiToString(const WordInfo&);
+    static std::string playerJoinInfoToString(const PlayerJoinInfo&);
 };

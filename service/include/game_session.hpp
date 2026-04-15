@@ -18,6 +18,7 @@
 #include "igame_session.hpp"
 #include "jisho.hpp"
 #include "mapper.hpp"
+#include "player_join_info.hpp"
 #include "player_score.hpp"
 #include "user.hpp"
 #include "word.hpp"
@@ -37,6 +38,7 @@ class GameSession : public IGameSession
 
     GameContext getInfo() override;
     void subscribe(ull, std::function<void(WordInfo, char32_t)>) override;
+    PlayerJoinInfo getPlayerJoinInfo() override;
 
   private:
     void saveStats();
