@@ -473,7 +473,7 @@ std::string Router::wiToString(const WordInfo& wi)
     json wiJson = {{"kanji", wi.kanji},
                    {"readings", wi.readings},
                    {"partsOfSpeach", wi.partsOfSpeach},
-                   {"meaning", wi.meaning}};
+                   {"meanings", wi.meanings}};
     return wiJson.dump();
 }
 
@@ -485,7 +485,7 @@ std::string Router::playerJoinInfoToString(const PlayerJoinInfo& info)
         json wordJson = {{"kanji", word.kanji},
                          {"readings", word.readings},
                          {"partsOfSpeach", word.partsOfSpeach},
-                         {"meaning", word.meaning}};
+                         {"meanings", word.meanings}};
         wordsJsonArray.push_back(wordJson);
     }
 
@@ -511,7 +511,7 @@ std::string Router::gameUpdateEventToString(const GameUpdateEvent& event)
              {{"kanji", word.kanji},
               {"readings", word.readings},
               {"partsOfSpeach", word.partsOfSpeach},
-              {"meaning", word.meaning}}},
+              {"meanings", word.meanings}}},
             {"lastKana", boost::locale::conv::utf_to_utf<char>(std::u32string(1, lastKana))}};
     }
     else if (event.type == GameUpdateEvent::GAME_STOPPED)

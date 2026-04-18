@@ -97,17 +97,39 @@ std::optional<Word> findRelevantWord(const std::string& word, const std::vector<
     return std::nullopt;
 }
 
-std::string findRelevantReading(const std::string& word, std::vector<std::string> readings)
+std::u32string conv_utf8_to_utf32(const std::string& s)
 {
-    for (auto& w : readings)
+    return boost::locale::conv::utf_to_utf<char32_t>(s);
+}
+
+std::string conv_utf32_to_utf8(const std::u32string& s)
+{
+    return boost::locale::conv::utf_to_utf<char>(s);
+}
+
+std::string findRelevantReading(const std::string& word, char32_t firstKana,
+                                std::vector<std::string> readings)
+{
+    if (readings.size() == 0)
     {
-        if (w == word)
+        return "";
+    }
+
+    std::string captReading = "";
+    for (const auto& reading : readings)
+    {
+        if (reading == word)
         {
-            return w;
+            return reading;
+        }
+
+        if (captReading.empty() && conv_utf8_to_utf32(reading).starts_with(firstKana))
+        {
+            captReading = reading;
         }
     }
 
-    return *readings.begin();
+    return !captReading.empty() ? captReading : readings[0];
 }
 
 bool isWordDoubled(const std::string& word, const std::vector<Word>& usedWords)
@@ -177,11 +199,6 @@ bool isSmallKana(char32_t c)
 bool isLongVowel(char32_t c)
 {
     return c == U'ー';
-}
-
-std::u32string conv_utf8_to_utf32(const std::string& s)
-{
-    return boost::locale::conv::utf_to_utf<char32_t>(s);
 }
 
 std::optional<char32_t> getLastKana(const std::u32string& u32)
@@ -309,7 +326,9 @@ HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
             return HandleWordStatus::NO_SPEACH_PART;
         }
 
-        auto reading = conv_utf8_to_utf32(findRelevantReading(word, wordInfo.readings));
+        auto reading =
+            conv_utf8_to_utf32(findRelevantReading(word, ctx_.lastKana, wordInfo.readings));
+
         if (reading == U"")
         {
             return HandleWordStatus::CANT_JOIN_WORDS;
@@ -349,6 +368,13 @@ HandleWordStatus GameSession::handleWord(ull id, const std::string& word)
 
         ps.score++;
         ctx_.wordsCount++;
+
+        std::string selectedReading = conv_utf32_to_utf8(reading);
+
+        if (wordInfo.kanji.empty())
+        {
+            wordInfo.kanji = selectedReading;
+        }
 
         players_.erase(it);
         players_.insert(ps);

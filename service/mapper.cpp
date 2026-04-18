@@ -12,5 +12,5 @@ GameInfo Mapper::GameToDto(Game game)
 
 WordInfo Mapper::WordToDto(Word word)
 {
-    return WordInfo(word.kanji, word.readings, word.partsOfSpeach, word.meaning);
+    return WordInfo(word.kanji, word.readings, word.partsOfSpeach, word.meanings);
 }

@@ -73,15 +73,11 @@ std::vector<Word> JishoDict::jsonToWords(json& obj)
 
         for (auto& sn : entry["senses"])
         {
-            for (auto& def : sn["english_definitions"])
+            if (sn.contains("english_definitions"))
             {
-                if (word.meaning != "")
+                for (auto& def : sn["english_definitions"])
                 {
-                    word.meaning = std::string(def);
-                }
-                else
-                {
-                    word.meaning += "\n" + std::string(def);
+                    word.meanings.emplace_back(std::string(def));
                 }
             }
 

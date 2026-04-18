@@ -13,5 +13,5 @@ class Word
     std::vector<std::string> readings;
     std::set<std::string> partsOfSpeach;
 
-    std::string meaning;
+    std::vector<std::string> meanings;
 };

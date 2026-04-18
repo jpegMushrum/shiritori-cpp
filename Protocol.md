@@ -169,7 +169,7 @@ Example: 100 0 1 42 0 あ
 
 **Response (Success):** `Player added successfully`
 
-**Response (Game Join Info)** `playerJoinedGame <gameId> {"lastKana":string,"usedWords":[{"kanji":string,"meaning":string,"partsOfSpeach":[]string,"readings":[]string}]}`
+**Response (Game Join Info)** `playerJoinedGame <gameId> {"lastKana":string,"usedWords":[{"kanji":string,"meanings":[]string,"partsOfSpeach":[]string,"readings":[]string}]}`
 
 **Response (Game Updates)** `gameUpdate <gameId> {event}`
 
@@ -177,7 +177,7 @@ Game Update Event Types:
 
 1. **Word Played** (when a new word is accepted):
 ```json
-{"type":"wordPlayed","word":{"kanji":string,"readings":[]string,"partsOfSpeach":[]string,"meaning":string},"lastKana":string}
+{"type":"wordPlayed","word":{"kanji":string,"readings":[]string,"partsOfSpeach":[]string,"meanings":[]string},"lastKana":string}
 ```
 
 2. **Game Stopped** (when game ends):

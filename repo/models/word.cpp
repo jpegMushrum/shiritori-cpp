@@ -1,3 +1,3 @@
 #include "word.hpp"
 
-Word::Word() : kanji(""), meaning("") {}
+Word::Word() : kanji(""), meanings({}) {}
